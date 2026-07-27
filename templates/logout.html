@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logout</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            background: url("{{ url_for('static', filename='loan_thankyou.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+        }
+        .logout-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            margin: auto;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        a:hover {
+            color: #1f618d;
+        }
+        .logout-success {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+   <div class="logout-box">
+        <h2><i class="fas fa-sign-out-alt"></i> Logout Successful</h2>
+        <p>Thank you for using the Loan Dashboard.</p>
+
+        <!-- Link back to login -->
+        <a href="{{ url_for('login') }}">
+            <i class="fas fa-arrow-left"></i> Click here to go to Login Page
+        </a>
+
+        <!-- Confirmation -->
+        <div class="logout-success">
+            <i class="fas fa-check-circle"></i> You have been logged out
+        </div>
+    </div>
+</body>
+</html>

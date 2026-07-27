@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV — Loan Approval</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <span class="eyebrow"></span>
+        <h1>Upload CSV Prediction</h1>
+    </header>
+
+    <div class="container narrow">
+
+        {% if error %}
+        <section class="error-banner card">
+            <p>{{ error }}</p>
+        </section>
+        {% endif %}
+
+        <section class="card">
+            <h2 class="section-title"><i class="fas fa-upload"></i> Upload Applications CSV</h2>
+
+            <p class="intro-text">Upload a CSV of applicant records to process them in one batch. Each applicant will be scored, and the predictions will be saved to your prediction history.</p>
+
+            <div class="hint-block">
+                <p class="hint-label">Required columns</p>
+                <p class="hint-value">income, credit_score, loan_amount, employment_years</p>
+            </div>
+
+            <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="csv_file">CSV File</label>
+                    <input type="file" id="csv_file" name="csv_file" class="form-control" accept=".csv" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Prediction Model</label>
+                    <select id="model" name="model" class="form-control" required>
+                        <option value="logistic_regression">Logistic Regression</option>
+                        <option value="random_forest">Random Forest</option>
+                        <option value="svm">Support Vector Machine (SVM)</option>
+                        <option value="decision_tree">Decision Tree</option>
+                        <option value="knn">K-Nearest Neighbors (KNN)</option>
+                        <option value="naive_bayes">Naive Bayes</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Upload &amp; Predict
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <a href="{{ url_for('dashboard') }}" class="back-link">
+            <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+        </a>
+    </footer>
+</body>
+</html>

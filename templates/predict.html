@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <span class="eyebrow"></span>
+        <h1>Loan Prediction</h1>
+    </header>
+
+    <div class="container two-col">
+
+        {% if result %}
+        <section class="result-banner card {{ 'badge-approved' if result == 'Approved' else 'badge-rejected' }}">
+            <p><strong>{{ result }}</strong> — Confidence {{ confidence }} &middot; {{ algorithm|capitalize }} model</p>
+        </section>
+        {% endif %}
+
+        {% if error %}
+        <section class="error-banner card">
+            <p>{{ error }}</p>
+        </section>
+        {% endif %}
+
+        <!-- Prediction Form -->
+        <section class="predict-section card">
+            <h2 class="section-title">Applicant Details</h2>
+            <form method="POST" class="predict-form">
+                {% for f in feature_names %}
+                <div class="form-group">
+                    <label for="{{ f }}">{{ labels[f] if f in labels else f }}</label>
+                    <input type="text" id="{{ f }}" name="{{ f }}" class="form-control" required>
+                </div>
+                {% endfor %}
+
+                <div class="form-group">
+                    <label for="model">Prediction Model</label>
+                    <select id="model" name="model" class="form-control select-narrow" required>
+                        <option value="logistic_regression">Logistic Regression</option>
+                        <option value="random_forest">Random Forest</option>
+                        <option value="svm">Support Vector Machine (SVM)</option>
+                        <option value="decision_tree">Decision Tree</option>
+                        <option value="knn">K-Nearest Neighbors (KNN)</option>
+                        <option value="naive_bayes">Naive Bayes</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Run Prediction
+                </button>
+            </form>
+        </section>
+
+        <!-- Past Predictions Table -->
+        <section class="results-section card">
+            <div class="section-header">
+                <h2 class="section-title">Past Predictions</h2>
+                <span class="section-meta">{{ loans|length }} record{{ 's' if loans|length != 1 else '' }}</span>
+            </div>
+            <div class="table-responsive">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Income</th>
+                            <th>Credit Score</th>
+                            <th>Loan Amount</th>
+                            <th>Employment Years</th>
+                            <th>Prediction</th>
+                            <th>Confidence</th>
+                            <th>Model Used</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for loan in loans %}
+                        <tr>
+                            <td>{{ loan.id }}</td>
+                            <td>{{ loan.income }}</td>
+                            <td>{{ loan.credit_score }}</td>
+                            <td>{{ loan.loan_amount }}</td>
+                            <td>{{ loan.employment_years }}</td>
+                            <td>
+                                {% if loan.prediction == 'Approved' %}
+                                    <span class="badge badge-approved">Approved</span>
+                                {% else %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ loan.confidence }}</td>
+                            <td>{{ loan.model_used|capitalize }}</td>
+                            <td>{{ loan.created_at }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align:center; font-family: 'Inter', sans-serif; color: var(--slate); padding: 32px 0;">No predictions yet — run one on the left to get started.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <footer class="footer">
+        <a href="{{ url_for('dashboard') }}" class="back-link">
+            <i class="fas fa-tachometer-alt"></i> Back to Dashboard
+        </a>
+    </footer>
+</body>
+</html>
