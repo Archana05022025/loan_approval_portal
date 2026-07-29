@@ -303,6 +303,9 @@ def csv_predict():
     CSV_STORE.pop(store_id, None)
     return jsonify({"success": True, "results": results})
 
+@app.route("/")
+def home():
+    return "Loan Approval Portal is running!"
 # ── Run App ──────────────────────────────────────
 if __name__ == "__main__":
     with app.app_context():
