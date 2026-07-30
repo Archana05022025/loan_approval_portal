@@ -2,14 +2,36 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 from flask_sqlalchemy import SQLAlchemy
 import pickle, numpy as np, pandas as pd, os, uuid
 from datetime import date
+import os
 
 app = Flask(__name__)
 app.secret_key = "loan_secret_key"
 
 # ── Database Config ───────────────────────────────
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "instance", "loan_data.db")
+
+
+# ── Database Config ───────────────────────────────
+if os.environ.get('VERCEL_ENV'):
+    # Vercel - PostgreSQL
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable not set on Vercel!")
+    
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    
+    app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+    }
+else:
+    # Local - SQLite
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(BASE_DIR, "instance", "loan_data.db")
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {}
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
@@ -59,21 +81,6 @@ for fname in model_files:
         with open(path, "rb") as f:
             MODELS[fname.split(".")[0]] = pickle.load(f)
 
-# Load scaler and feature names
-with open(os.path.join(MODEL_DIR, "scaler.pkl"), "rb") as f:
-    scaler = pickle.load(f)
-
-with open(os.path.join(MODEL_DIR, "features.pkl"), "rb") as f:
-    feature_names = [str(x) for x in pickle.load(f)]
-
-print("Loaded models:", list(MODELS.keys()))
-if not MODELS:
-    raise RuntimeError("No models loaded! Please check your model directory.")
-
-
-def get_model(algo):
-    """Return the requested model by name, falling back to any available model."""
-    return MODELS.get(algo) or next(iter(MODELS.values()))
 
 
 # ── Signup ───────────────────────────────────────
